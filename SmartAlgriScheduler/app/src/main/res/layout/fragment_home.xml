@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:orientation = "horizontal">
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight = "1"
+            android:layout_margin = "10dp">
+
+            <com.john.waveview.WaveView
+                android:id="@+id/water1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#F6c3e0"
+                app:above_wave_color="#De2f91"
+                app:blow_wave_color="#Bd2d7d"
+                app:progress="50" />
+
+            <TextView
+                android:id="@+id/txtWaterLevel1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="28%"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight = "1"
+            android:layout_margin = "10dp">
+
+            <com.john.waveview.WaveView
+                android:id="@+id/water2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#9ea8f0"
+                app:above_wave_color="#3446cb"
+                app:blow_wave_color="#2c3ba6"
+                app:progress="80" />
+            <TextView
+                android:id="@+id/txtWaterLevel2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="28%"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight = "1"
+            android:layout_margin = "10dp">
+            <com.john.waveview.WaveView
+                android:id="@+id/water3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:background="#82f2a9"
+                app:above_wave_color="#2dc562"
+                app:blow_wave_color="#279e50"
+                app:progress="30"/>
+            <TextView
+                android:id="@+id/txtWaterLevel3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="32%"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital" />
+        </RelativeLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.25"
+        android:layout_margin = "0dp"
+        android:orientation = "horizontal">
+
+        <com.github.angads25.toggle.widget.LabeledSwitch
+            android:id="@+id/button1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight = "1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="10sp"
+            app:textOn = "BẬT"
+            app:textOff = "TẮT"
+            app:colorBorder="@color/colorAccent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.367"
+            app:on="false" />
+
+        <com.github.angads25.toggle.widget.LabeledSwitch
+            android:id="@+id/button2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight = "1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="10sp"
+            app:textOn = "BẬT"
+            app:textOff = "TẮT"
+            app:colorBorder="#3446cb"
+            app:colorOn="#3446cb"
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.495"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.367"
+            app:on="false" />
+        <com.github.angads25.toggle.widget.LabeledSwitch
+            android:id="@+id/button3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight = "1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="10sp"
+            app:textOn = "BẬT"
+            app:textOff = "TẮT"
+            app:colorBorder="#2dc562"
+            app:colorOn="#2dc562"
+            app:on="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation = "horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight = "2">
+
+            <com.john.waveview.WaveView
+                android:id="@+id/water4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#E8848f"
+                app:above_wave_color="#D33244"
+                app:blow_wave_color="#B02c3b"
+                app:progress="30" />
+
+            <TextView
+                android:id="@+id/txtWaterLevel4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+
+                android:gravity="center"
+                android:text="32%"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital" />
+
+            <com.github.angads25.toggle.widget.LabeledSwitch
+                android:id="@+id/button4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_alignParentBottom="true"
+                android:textSize="10sp"
+                app:colorBorder="@color/colorAccent"
+                app:on="false"
+                app:textOff="TẮT"
+                app:textOn="BẬT" />
+
+        </RelativeLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.75"
+            android:orientation = "vertical"
+            android:layout_margin = "10dp">
+            <ImageView
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:src = "@drawable/ph_icon"
+                android:gravity = "center"/>
+            <TextView
+                android:id="@+id/txtPH"
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:text="6.8"
+                android:gravity = "center"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital"/>
+            <ImageView
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:src = "@drawable/ec2_icon"
+                android:gravity = "center"/>
+
+            <TextView
+                android:id="@+id/txtEC"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="122"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital" />
+
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.75"
+            android:orientation="vertical"
+            android:layout_margin = "10dp">
+
+            <ImageView
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:src = "@drawable/tds_icon"
+                android:gravity = "center"/>
+            <TextView
+                android:id="@+id/txtTDS"
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:text="200"
+                android:gravity = "center"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital"/>
+            <ImageView
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:src = "@drawable/orp_icon"
+                android:gravity = "center"/>
+            <TextView
+                android:id="@+id/txtORP"
+                android:layout_width = "match_parent"
+                android:layout_height = "0dp"
+                android:layout_weight = "1"
+                android:text="321"
+                android:gravity = "center"
+                android:textAlignment="center"
+                android:textColor="#000000"
+                android:textSize="30dp"
+                app:fontFamily="@font/digital"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4">
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/piechart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/text_home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.appcompat.widget.LinearLayoutCompat>

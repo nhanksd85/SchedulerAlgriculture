@@ -109,12 +109,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.25"
+        android:layout_weight="0.35"
         android:layout_margin = "0dp"
         android:orientation = "horizontal">
 
         <com.github.angads25.toggle.widget.LabeledSwitch
-            android:id="@+id/button1"
+            android:id="@+id/btnWater1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight = "1"
@@ -133,7 +133,7 @@
             app:on="false" />
 
         <com.github.angads25.toggle.widget.LabeledSwitch
-            android:id="@+id/button2"
+            android:id="@+id/btnWater2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight = "1"
@@ -153,7 +153,7 @@
             app:layout_constraintVertical_bias="0.367"
             app:on="false" />
         <com.github.angads25.toggle.widget.LabeledSwitch
-            android:id="@+id/button3"
+            android:id="@+id/btnWater3"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight = "1"
@@ -205,9 +205,11 @@
                 app:fontFamily="@font/digital" />
 
             <com.github.angads25.toggle.widget.LabeledSwitch
-                android:id="@+id/button4"
-                android:layout_width="match_parent"
+                android:id="@+id/btnWater4"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="10dp"
                 android:layout_marginEnd="10dp"
@@ -215,9 +217,28 @@
                 android:layout_marginRight="10dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:layout_alignParentBottom="true"
                 android:textSize="10sp"
-                app:colorBorder="@color/colorAccent"
+                app:colorBorder="#Bd194e"
+                app:colorOn="#Bd194e"
+                app:on="false"
+                app:textOff="TẮT"
+                app:textOn="BẬT" />
+            <com.github.angads25.toggle.widget.LabeledSwitch
+                android:id="@+id/btnWater5"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:textSize="10sp"
+                app:colorBorder="#Bd194e"
+                app:colorOn="#Bd194e"
                 app:on="false"
                 app:textOff="TẮT"
                 app:textOn="BẬT" />
@@ -316,17 +337,53 @@
     </LinearLayout>
 
 
+    <nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup
+        android:id="@+id/themedButtonSelection"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight = "0.5"
+        app:justifyContent="center">
+
+        <nl.bryanderidder.themedtogglebuttongroup.ThemedButton
+            android:id="@+id/btn1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:toggle_text="LIVE CAMERA" />
+
+        <nl.bryanderidder.themedtogglebuttongroup.ThemedButton
+            android:id="@+id/btn2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:toggle_text="ĐỒ THỊ CẢM BIẾN" />
+
+        <nl.bryanderidder.themedtogglebuttongroup.ThemedButton
+            android:id="@+id/btn3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:toggle_text="AI CAMERA" />
+
+    </nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="4">
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/piechart"
+
+        <com.github.mikephil.charting.charts.CombinedChart
+            android:id="@+id/combinedChart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="30dp"
             />
+<!--        <com.github.mikephil.charting.charts.PieChart-->
+<!--            android:id="@+id/piechart"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            />-->
     </LinearLayout>
 
     <TextView

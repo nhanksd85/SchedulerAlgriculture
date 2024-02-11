@@ -18,12 +18,12 @@ import java.util.regex.Pattern;
 public class MqttHelper {
     public MqttAndroidClient mqttAndroidClient;
 
-    public String[] arrayTopics = {"/server/monitoring/AABBCCDD/+"};
+    public String[] arrayTopics = {"/innovation/algriculture/AABBCCDD/+"};
 
     String clientId = "dsfgfdsgfdsg";
 
-    public String username = "servermonitoring";
-    String password = "ServerMonitoring_wQ1Z3Q5n64";
+    public String username = "innovation";
+    String password = "Innovation_RgPQAZoA5N";
     String serverUri = "tcp://mqttserver.tk:1883";
 
     public MqttHelper(Context context, String usr, String id){

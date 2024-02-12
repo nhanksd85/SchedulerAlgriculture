@@ -6,7 +6,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.github.angads25.toggle.interfaces.OnToggledListener;
 import com.github.angads25.toggle.model.ToggleableView;
@@ -54,6 +56,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
     LabeledSwitch btnWater1, btnWater2, btnWater3, btnWater4, btnWater5;
     ThemedButton btnLiveCamera, btnGraph, btnAICamera;
     private CombinedChart mChart;
+    private LinearLayout mAIPicture;
+    private VideoView mLiveCamera;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -68,6 +72,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
 
         txtWaterLevel1 = root.findViewById(R.id.txtWaterLevel1);
         water1 = root.findViewById(R.id.water1);
+
+        txtWaterLevel2 = root.findViewById(R.id.txtWaterLevel2);
+        water2 = root.findViewById(R.id.water2);
+
+        txtWaterLevel3 = root.findViewById(R.id.txtWaterLevel3);
+        water3 = root.findViewById(R.id.water3);
+
+        txtWaterLevel4 = root.findViewById(R.id.txtWaterLevel4);
+        water4 = root.findViewById(R.id.water4);
 
         btnLiveCamera = root.findViewById(R.id.btn1);
         btnGraph = root.findViewById(R.id.btn2);
@@ -90,6 +103,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         btnWater5.setOnToggledListener(this);
 
         mChart = (CombinedChart) root.findViewById(R.id.combinedChart);
+        mAIPicture = (LinearLayout) root.findViewById(R.id.aiPictures);
+        mLiveCamera = (VideoView) root.findViewById(R.id.liveCameraView);
 
 
         setChart();
@@ -213,13 +228,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         switch (view.getId()){
             case R.id.btn1:
                 Log.d("ChatGPT", "LIVE CAMERA");
-                ((MainActivity)getActivity()).startVoiceInput();
+                mChart.setVisibility(View.GONE);
+                mAIPicture.setVisibility(View.GONE);
+                mLiveCamera.setVisibility(View.VISIBLE);
                 break;
             case R.id.btn2:
                 Log.d("ChatGPT", "GRAPH");
+                mChart.setVisibility(View.VISIBLE);
+                mAIPicture.setVisibility(View.GONE);
+                mLiveCamera.setVisibility(View.GONE);
                 break;
             case R.id.btn3:
                 Log.d("ChatGPT", "AI CAMERA");
+                mChart.setVisibility(View.GONE);
+                mAIPicture.setVisibility(View.VISIBLE);
+                mLiveCamera.setVisibility(View.GONE);
                 break;
         }
     }
@@ -260,9 +283,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
     @Override
     public void onResume() {
         super.onResume();
-        float level = ((MainActivity)getActivity()).getWaterLevel();
-        txtWaterLevel1.setText(level + "%");
-        water1.setProgress((int)level);
+
+        updateWaterLevelStatus(((MainActivity)getActivity()).getWaterLevelStatus());
+        updatePumpStatus(((MainActivity)getActivity()).getPumpStatus());
     }
 
     @Override
@@ -299,7 +322,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
     }
 
     public void updatePumpStatus(PumpStationModel pumpStation) {
-        Log.d("SmartAlgri", "update from main activity");
+        Log.d("SmartAlgri", "Update pump status from main activity");
         for(PumpModel aPump : pumpStation.getSensors()){
             if(aPump.getSensorID().equals("pump_0001")){
                 btnWater1.setOn(aPump.getSensorValue() == 1);
@@ -314,4 +337,25 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
             }
         }
     }
+
+    public void updateWaterLevelStatus(PumpStationModel waterLevelStation) {
+        Log.d("SmartAlgri", "Update water level status from main activity");
+        for(PumpModel aPump : waterLevelStation.getSensors()){
+            if(aPump.getSensorID().equals("water_level_0001")) {
+                water1.setProgress(aPump.getSensorValue());
+                txtWaterLevel1.setText(aPump.getSensorValue() + "%");
+            }else if(aPump.getSensorID().equals("water_level_0002")) {
+                water2.setProgress(aPump.getSensorValue());
+                txtWaterLevel2.setText(aPump.getSensorValue() + "%");
+            }else if(aPump.getSensorID().equals("water_level_0003")) {
+                water3.setProgress(aPump.getSensorValue());
+                txtWaterLevel3.setText(aPump.getSensorValue()  + "%");
+            }else if(aPump.getSensorID().equals("water_level_0004")) {
+                water4.setProgress(aPump.getSensorValue());
+                txtWaterLevel4.setText(aPump.getSensorValue() + "%");
+            }
+        }
+    }
+
+
 }

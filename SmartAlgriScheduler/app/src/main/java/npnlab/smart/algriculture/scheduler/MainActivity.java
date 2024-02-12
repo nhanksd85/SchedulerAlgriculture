@@ -49,7 +49,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String ALLOWED_CHARACTERS ="0123456789qwertyuiopasdfghjklzxcvbnm";
 
 
-    private PumpStationModel pumpStationModel = new PumpStationModel();
+    private PumpStationModel pumpStationModel = new PumpStationModel(0);
+    private PumpStationModel waterLevelStationModel = new PumpStationModel(1);
+
     private Gson gson = new Gson();
 
     private static String getRandomString(final int sizeOfRandomString)
@@ -85,8 +87,15 @@ public class MainActivity extends AppCompatActivity {
                     if(f instanceof HomeFragment){
                         ((HomeFragment)f).updatePumpStatus(pumpStationModel);
                     }
+                }else if (topic.equals("/innovation/algriculture/AABBCCDD/waterLevelStatus")) {
+                    waterLevelStationModel = gson.fromJson(message.toString(), PumpStationModel.class);
+                    Fragment f = getForegroundFragment();
+                    if(f instanceof HomeFragment){
+                        ((HomeFragment)f).updateWaterLevelStatus(waterLevelStationModel);
+                    }
                 }
-            }
+
+                }
 
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
@@ -177,9 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public float getWaterLevel(){
-        return 29;
-    }
+
 
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
@@ -242,4 +249,12 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+    public PumpStationModel getPumpStatus() {
+        return pumpStationModel;
+    }
+
+    public PumpStationModel getWaterLevelStatus(){
+        return waterLevelStationModel;
+    }
 }

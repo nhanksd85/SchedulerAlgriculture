@@ -1,0 +1,25 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/_15mins"
+        android:title="15 phút"/>
+
+    <item
+        android:id="@+id/_30mins"
+        android:title="30 phút"/>
+
+    <item
+        android:id="@+id/_one_hour"
+        android:title="1 giờ"/>
+
+    <item
+        android:id="@+id/_two_hour"
+        android:title="2 giờ"/>
+
+    <item
+        android:id="@+id/_six_hour"
+        android:title="6 giờ"/>
+
+    <item
+        android:id="@+id/_twelve_hour"
+        android:title="12 giờ"/>
+</menu>

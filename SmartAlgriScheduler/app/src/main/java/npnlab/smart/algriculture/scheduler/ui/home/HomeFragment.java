@@ -1,11 +1,13 @@
 package npnlab.smart.algriculture.scheduler.ui.home;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -42,7 +44,9 @@ import nl.bryanderidder.themedtogglebuttongroup.ThemedButton;
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup;
 import npnlab.smart.algriculture.scheduler.MainActivity;
 import npnlab.smart.algriculture.scheduler.R;
+import npnlab.smart.algriculture.scheduler.Utilities;
 import npnlab.smart.algriculture.scheduler.databinding.FragmentHomeBinding;
+import npnlab.smart.algriculture.scheduler.model.ImageStationModel;
 import npnlab.smart.algriculture.scheduler.model.PumpModel;
 import npnlab.smart.algriculture.scheduler.model.PumpStationModel;
 import npnlab.smart.algriculture.scheduler.network.MqttHelper;
@@ -53,8 +57,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
     TextView txtWaterLevel1, txtWaterLevel2, txtWaterLevel3, txtWaterLevel4;
     WaveView water1, water2, water3, water4;
 
+
     LabeledSwitch btnWater1, btnWater2, btnWater3, btnWater4, btnWater5;
     ThemedButton btnLiveCamera, btnGraph, btnAICamera;
+    ImageView imgFragment1, imgFragment2, imgFragment3, imgFragment4, imgFragment5, imgFragment6;
+
     private CombinedChart mChart;
     private LinearLayout mAIPicture;
     private VideoView mLiveCamera;
@@ -106,7 +113,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         mAIPicture = (LinearLayout) root.findViewById(R.id.aiPictures);
         mLiveCamera = (VideoView) root.findViewById(R.id.liveCameraView);
 
-
+        imgFragment1 = (ImageView) root.findViewById(R.id.imgFragment1);
+        imgFragment2 = (ImageView) root.findViewById(R.id.imgFragment2);
+        imgFragment3 = (ImageView) root.findViewById(R.id.imgFragment3);
+        imgFragment4 = (ImageView) root.findViewById(R.id.imgFragment4);
+        imgFragment5 = (ImageView) root.findViewById(R.id.imgFragment5);
+        imgFragment6 = (ImageView) root.findViewById(R.id.imgFragment6);
         setChart();
         return root;
     }
@@ -286,6 +298,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
 
         updateWaterLevelStatus(((MainActivity)getActivity()).getWaterLevelStatus());
         updatePumpStatus(((MainActivity)getActivity()).getPumpStatus());
+        updateFragmentImage(((MainActivity)getActivity()).getFragmentImages());
     }
 
     @Override
@@ -357,5 +370,32 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         }
     }
 
+    private int counter = 11;
+    public void updateFragmentImage(ImageStationModel imageStation) {
+        if(imageStation == null)
+            return;
+        if(imageStation.getImages() == null)
+            return;
+        if(imageStation.getImages().size() < 6)
+            return;
+        Bitmap bmp1 = Utilities.convertBase64ToBitmap(imageStation.getImages().get(0).getData());
+        Bitmap bmp2 = Utilities.convertBase64ToBitmap(imageStation.getImages().get(1).getData());
 
+        Bitmap bmp3 = Utilities.convertBase64ToBitmap(imageStation.getImages().get(2).getData());
+        Bitmap bmp4 = Utilities.convertBase64ToBitmap(imageStation.getImages().get(3).getData());
+
+        Bitmap bmp5 = Utilities.convertBase64ToBitmap(imageStation.getImages().get(4).getData());
+        Bitmap bmp6 = Utilities.convertBase64ToBitmap(imageStation.getImages().get(5).getData());
+
+
+
+        imgFragment1.setImageBitmap(bmp1);
+        imgFragment2.setImageBitmap(bmp2);
+
+        imgFragment3.setImageBitmap(bmp3);
+        imgFragment4.setImageBitmap(bmp4);
+
+        imgFragment5.setImageBitmap(bmp5);
+        imgFragment6.setImageBitmap(bmp6);
+    }
 }

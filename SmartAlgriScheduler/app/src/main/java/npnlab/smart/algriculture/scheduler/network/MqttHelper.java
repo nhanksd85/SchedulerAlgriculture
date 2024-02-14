@@ -19,6 +19,7 @@ public class MqttHelper {
     public MqttAndroidClient mqttAndroidClient;
 
     public String[] arrayTopics = {"/innovation/algriculture/AABBCCDD/+"};
+    //public String[] arrayTopics = {"/innovation/algriculture/imagePictures"};
 
     String clientId = "dsfgfdsgfdsg";
 

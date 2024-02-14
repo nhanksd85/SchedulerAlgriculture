@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background = "#ffffff"
+    android:layout_marginBottom="20dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:orientation = "horizontal">
+        <ImageView
+            android:layout_width = "0dp"
+            android:layout_height= "match_parent"
+            android:layout_weight = "3"
+            android:src="@drawable/hung_lui"
+            android:scaleType="fitXY"/>
+        <LinearLayout
+            android:layout_width = "0dp"
+            android:layout_height= "match_parent"
+            android:layout_weight = "7"
+            android:orientation = "vertical"
+            android:layout_marginLeft = "5dp">
+
+            <LinearLayout
+                android:layout_width = "match_parent"
+                android:layout_height= "0dp"
+                android:layout_weight = "1"
+                android:orientation = "horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "3"
+                    android:text = "TÊN: "
+                    android:gravity = "center|left"
+                    />
+                <TextView
+                    android:id="@+id/txtSchedulerName"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "5"
+                    android:text = "LỊCH TƯỚI 1"
+                    android:textSize="15dp"
+                    android:gravity = "center|left"/>
+
+                <ImageView
+                    android:id="@+id/btnDelete"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:background="@drawable/ic_delete"
+                    android:scaleType="fitCenter">
+
+                </ImageView>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width = "match_parent"
+                android:layout_height= "0dp"
+                android:layout_weight = "1"
+                android:orientation = "horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1.4"
+                    android:text = "BẮT ĐẦU: "
+                    android:gravity = "center|left" />
+                <TextView
+                    android:id = "@+id/txtSchedulerStart"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1.1"
+                    android:text = "6:45"
+                    android:gravity = "center" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1.4"
+                    android:text = "KẾT THÚC: "
+                    android:gravity = "center|left" />
+                <TextView
+                    android:id = "@+id/txtSchedulerStop"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1.1"
+                    android:text = "6:45"
+                    android:gravity = "center" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width = "match_parent"
+                android:layout_height= "0dp"
+                android:layout_weight = "1"
+                android:orientation = "horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "2"
+                    android:text = "CHÂM PHÂN: "
+                    android:gravity = "center|left"
+                    />
+
+                <TextView
+                    android:id = "@+id/txtFlow1"
+                    android:background = "#F6c3e0"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1"
+                    android:text = "20ml "
+                    android:gravity = "center"
+                    />
+
+                <TextView
+                    android:id = "@+id/txtFlow2"
+                    android:background = "#9ea8f0"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1"
+                    android:text = "20ml "
+                    android:gravity = "center"
+                    />
+
+                <TextView
+                    android:id = "@+id/txtFlow3"
+                    android:background = "#82f2a9"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1"
+                    android:text = "20ml "
+                    android:gravity = "center"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width = "match_parent"
+                android:layout_height= "0dp"
+                android:layout_weight = "1"
+                android:orientation = "horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "2"
+                    android:text = "LẬP LẠI SAU: "
+                    android:gravity = "center|left"
+                    />
+                <TextView
+                    android:id = "@+id/txtSchedulerCycle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1.5"
+                    android:text = "30 phút"
+                    android:gravity = "center"
+                    />
+                <com.github.angads25.toggle.widget.LabeledSwitch
+                    android:id="@+id/btnActive"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight = "1.5"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="0dp"
+                    android:textSize="10sp"
+                    app:textOn = "BẬT"
+                    app:textOff = "TẮT"
+                    app:colorBorder="@color/colorAccent"
+                    app:on="false" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

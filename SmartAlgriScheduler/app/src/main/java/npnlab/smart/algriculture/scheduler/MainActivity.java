@@ -26,6 +26,8 @@ import org.json.JSONObject;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -37,7 +39,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 import npnlab.smart.algriculture.scheduler.databinding.ActivityMainBinding;
+import npnlab.smart.algriculture.scheduler.menu.SchedulerAdapter;
+import npnlab.smart.algriculture.scheduler.model.ImageStationModel;
 import npnlab.smart.algriculture.scheduler.model.PumpStationModel;
+import npnlab.smart.algriculture.scheduler.model.SchedulerModel;
 import npnlab.smart.algriculture.scheduler.network.MqttHelper;
 import npnlab.smart.algriculture.scheduler.ui.dashboard.DashboardFragment;
 import npnlab.smart.algriculture.scheduler.ui.home.HomeFragment;
@@ -51,7 +56,9 @@ public class MainActivity extends AppCompatActivity {
 
     private PumpStationModel pumpStationModel = new PumpStationModel(0);
     private PumpStationModel waterLevelStationModel = new PumpStationModel(1);
-
+    private ImageStationModel imageStationModel = new ImageStationModel();
+    private List<SchedulerModel> mScheduler;
+    public SchedulerAdapter mSchedulerAdapter;
     private Gson gson = new Gson();
 
     private static String getRandomString(final int sizeOfRandomString)
@@ -81,22 +88,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void messageArrived(String topic, MqttMessage message) throws Exception {
                 Log.d("SmartAlgri", topic + "  : " + message.toString());
-                if (topic.equals("/innovation/algriculture/AABBCCDD/pumpStatus")){
+                if (topic.equals("/innovation/algriculture/AABBCCDD/pumpStatus")) {
                     pumpStationModel = gson.fromJson(message.toString(), PumpStationModel.class);
                     Fragment f = getForegroundFragment();
-                    if(f instanceof HomeFragment){
-                        ((HomeFragment)f).updatePumpStatus(pumpStationModel);
+                    if (f instanceof HomeFragment) {
+                        ((HomeFragment) f).updatePumpStatus(pumpStationModel);
                     }
-                }else if (topic.equals("/innovation/algriculture/AABBCCDD/waterLevelStatus")) {
+                } else if (topic.equals("/innovation/algriculture/AABBCCDD/waterLevelStatus")) {
                     waterLevelStationModel = gson.fromJson(message.toString(), PumpStationModel.class);
                     Fragment f = getForegroundFragment();
-                    if(f instanceof HomeFragment){
-                        ((HomeFragment)f).updateWaterLevelStatus(waterLevelStationModel);
+                    if (f instanceof HomeFragment) {
+                        ((HomeFragment) f).updateWaterLevelStatus(waterLevelStationModel);
+                    }
+                } else if (topic.equals("/innovation/algriculture/AABBCCDD/imagePictures")) {
+
+                    Fragment f = getForegroundFragment();
+                    imageStationModel = gson.fromJson(message.toString(), ImageStationModel.class);
+                    if (f instanceof HomeFragment) {
+                        ((HomeFragment) f).updateFragmentImage(imageStationModel);
                     }
                 }
-
-                }
-
+            }
             @Override
             public void deliveryComplete(IMqttDeliveryToken token) {
 
@@ -138,8 +150,21 @@ public class MainActivity extends AppCompatActivity {
 
         startMQTT("innovation");
 
-        String json = gson.toJson(pumpStationModel);
-        Log.d("ChatGPT", json);
+        String jsonScheduler = "";
+        try{
+            jsonScheduler = Utilities.loadKey(this,"Scheduler");
+        }catch (Exception e){
+            jsonScheduler = "[{\"cycle\":15,\"flow1\":20,\"flow2\":20,\"flow3\":20,\"schedulerName\":\"LỊCH TƯỚI 1\",\"startTime\":\"7:15\",\"stopTime\":\"7:45\"},{\"cycle\":15,\"flow1\":20,\"flow2\":20,\"flow3\":20,\"schedulerName\":\"LỊCH TƯỚI 2\",\"startTime\":\"9:15\",\"stopTime\":\"9:45\"}]";
+        }
+
+        SchedulerModel[] mSchedulerDataBase = gson.fromJson(jsonScheduler, SchedulerModel[].class);
+        mScheduler = new ArrayList<>();
+        for(int i = 0; i < mSchedulerDataBase.length; i++){
+            mScheduler.add(mSchedulerDataBase[i]);
+        }
+        mSchedulerAdapter = new SchedulerAdapter(this, mScheduler);
+        Log.d("ChatGPT", "Scheduler size " + mScheduler.size());
+
     }
 
 
@@ -256,5 +281,20 @@ public class MainActivity extends AppCompatActivity {
 
     public PumpStationModel getWaterLevelStatus(){
         return waterLevelStationModel;
+    }
+    public ImageStationModel getFragmentImages(){
+        return imageStationModel;
+    }
+
+    public void UpdateSchedulerList(){
+        Gson gson = new Gson();
+        String json = gson.toJson(mScheduler);
+        Utilities.saveKey(this,"Scheduler", json);
+    }
+
+    public void AddSchedulerList() {
+        SchedulerModel mItem = new SchedulerModel("LỊCH TƯỚI " + (mScheduler.size() + 1));
+        mScheduler.add(mItem);
+        mSchedulerAdapter.notifyDataSetChanged();
     }
 }

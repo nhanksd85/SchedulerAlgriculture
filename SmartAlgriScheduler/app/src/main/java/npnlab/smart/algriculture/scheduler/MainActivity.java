@@ -22,14 +22,21 @@ import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.nio.charset.Charset;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.regex.Pattern;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -107,6 +114,25 @@ public class MainActivity extends AppCompatActivity {
                     if (f instanceof HomeFragment) {
                         ((HomeFragment) f).updateFragmentImage(imageStationModel);
                     }
+                } else if (topic.equals("/innovation/algriculture/AABBCCDD/water_sensor")){
+                    try{
+                        JSONObject jsonObj = new JSONObject(message.toString());
+                        Fragment f = getForegroundFragment();
+                        if (f instanceof HomeFragment) {
+                            ((HomeFragment) f).updateWaterLevelStatus(jsonObj);
+                        }
+                    }
+                    catch (Exception e) {}
+                } else if(topic.equals("/innovation/algriculture/AABBCCDD/epcb_sensor")){
+                    try{
+
+                        JSONArray jsonObj = new JSONObject(message.toString()).getJSONArray("sensors");
+                        Fragment f = getForegroundFragment();
+                        if (f instanceof HomeFragment) {
+                            ((HomeFragment) f).updateWaterEPCB(jsonObj);
+                        }
+                    }
+                    catch (Exception e) {}
                 }
             }
             @Override
@@ -141,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
             public void onInit(int initStatus) {
                 if (initStatus == TextToSpeech.SUCCESS) {
                     niceTTS.setLanguage(Locale.forLanguageTag("VI"));
-                    talkToMe("Xin chào các bạn, tôi là hệ thống trợ lý ảo nhân tạo dựa trên Chat gi pi ti");
+                    //talkToMe("Xin chào các bạn, tôi là hệ thống trợ lý ảo nhân tạo dựa trên Chat gi pi ti");
                 }else{
                     Log.d("ChatGPT", "Init fail");
                 }
@@ -165,9 +191,140 @@ public class MainActivity extends AppCompatActivity {
         mSchedulerAdapter = new SchedulerAdapter(this, mScheduler);
         Log.d("ChatGPT", "Scheduler size " + mScheduler.size());
 
+        Timer aTimer = new Timer();
+        TimerTask aTask = new TimerTask() {
+            @Override
+            public void run() {
+                DFARun();
+                timerRun();
+            }
+        };
+        aTimer.schedule(aTask, 20000, 1000);
     }
 
+    int[] timerCounter = new int[8];
+    int[] timerFlag = new int[8];
 
+    public void timerRun(){
+        for(int i = 0; i < 8; i++){
+            if(timerCounter[i] > 0){
+                timerCounter[i]--;
+                if(timerCounter[i] <=0) timerFlag[i] = 1;
+            }
+        }
+    }
+
+    public void setTimer(int index, int value){
+        timerFlag[index] = 0;
+        timerCounter[index] = value;
+    }
+
+    int[] status = new int[8];
+    int ratio = 2;
+    public void DFARun(){
+        Date currentTime = Calendar.getInstance().getTime();
+
+        for(int i = 0; i < mScheduler.size(); i++){
+            String[] startTime = mScheduler.get(i).getStartTime().split(Pattern.quote(":"));
+
+            switch (status[i]){
+                case 0: //Check the activated scheduler
+                    if(mScheduler.get(i).isActive() == true){
+                        Log.d("Scheduler",  "The scheduler " + i + " is ACTIVE at " + mScheduler.get(i).getStartTime() );
+                        Log.d("Scheduler", "Current time is " + currentTime.getHours() + "***" + currentTime.getMinutes());
+                        status[i] = 1;
+                    }
+                    break;
+                case 1: //Waiting to the starting time
+                    int startTiming = Integer.parseInt(startTime[0]) * 60 + Integer.parseInt(startTime[1]);
+
+                    int currTiming = currentTime.getHours() * 60 + currentTime.getMinutes();
+                    if(startTiming - currTiming < 2
+                            && Integer.parseInt(startTime[0]) == currentTime.getHours()
+                            && startTiming - currTiming > 0){
+                        talkToMe("Còn một phút nữa hệ thống sẽ bắt đầu kích hoạt");
+                        Log.d("Scheduler", currTiming + "  " + startTiming);
+                        status[i] = 2;
+                    }
+                    break;
+                case 2: //Start the irragation process
+
+                    if(Integer.parseInt(startTime[0]) == currentTime.getHours() && Integer.parseInt(startTime[1]) == currentTime.getMinutes()){
+                        talkToMe("Quy trình tưới tiêu bắt đầu. Máy châm phân 1 hoạt động");
+                        updatePumpStatus(0, true);
+                        status[i] = 3;
+                        int time_out = mScheduler.get(i).getFlow1()/ratio;
+                        setTimer(0, time_out);
+
+                    }
+                    break;
+                case 3:
+                    if(timerFlag[0] == 1){
+                        talkToMe("Máy châm phân 1 kết thúc. Máy châm phân 2 hoạt động");
+                        updatePumpStatus(0, false);
+                        status[i] = 4;
+                        setTimer(0, 2);
+                    }
+                    break;
+                case 4: //Turn on irrigation 2
+                    if(timerFlag[0] == 1){
+                        updatePumpStatus(1, true);
+                        status[i] = 5;
+                        int time_out = mScheduler.get(i).getFlow2()/ratio;
+                        setTimer(0, time_out);
+                    }
+                    break;
+                case 5: //Turn off irrigation 2
+                    if(timerFlag[0] == 1){
+                        talkToMe("Máy châm phân 2 kết thúc. Máy châm phân 3 hoạt động");
+
+                        updatePumpStatus(1, false);
+                        status[i] = 6;
+                        setTimer(0, 2);
+                    }
+                    break;
+                case 6: //Turn on irrigation 3
+                    if(timerFlag[0] == 1){
+                        updatePumpStatus(2, true);
+                        status[i] = 7;
+                        int time_out = mScheduler.get(i).getFlow3()/ratio;
+                        setTimer(0, time_out);
+                    }
+                    break;
+                case 7: //Turn of irrigation 3
+                    if(timerFlag[0] == 1){
+                        talkToMe("Máy châm phân 3 kết thúc. Bơm xoay vòng hoạt động");
+
+                        updatePumpStatus(2, false);
+                        status[i] = 8;
+                        setTimer(0, 2);
+                    }
+                    break;
+                case 8:
+                    if(timerFlag[0] == 1){
+                        updatePumpStatus(4, true);
+                        setTimer(0, 20);
+                        status[i] = 9;
+                    }
+                    break;
+                case 9:
+                    if(timerFlag[0] == 1){
+                        talkToMe("Lịch tưới tiêu kết thúc");
+                        updatePumpStatus(4, false);
+                        status[i] = 10;
+                        setTimer(0, 2);
+                    }
+                    break;
+                case 10:
+                    if(timerFlag[0] == 1){
+                        status[i] = 0;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
     public Fragment getForegroundFragment(){
         Fragment navHostFragment = getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
         return navHostFragment == null ? null : navHostFragment.getChildFragmentManager().getFragments().get(0);

@@ -2,6 +2,7 @@ package npnlab.smart.algriculture.scheduler.ui.home;
 
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,13 +34,22 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.john.waveview.WaveView;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import cz.msebera.android.httpclient.Header;
 import nl.bryanderidder.themedtogglebuttongroup.ThemedButton;
 import nl.bryanderidder.themedtogglebuttongroup.ThemedToggleButtonGroup;
 import npnlab.smart.algriculture.scheduler.MainActivity;
@@ -55,6 +65,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
 
     private FragmentHomeBinding binding;
     TextView txtWaterLevel1, txtWaterLevel2, txtWaterLevel3, txtWaterLevel4;
+    TextView txtPH, txtEC, txtORP, txtTDS;
     WaveView water1, water2, water3, water4;
 
 
@@ -120,6 +131,28 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         imgFragment5 = (ImageView) root.findViewById(R.id.imgFragment5);
         imgFragment6 = (ImageView) root.findViewById(R.id.imgFragment6);
         setChart();
+
+        txtPH = (TextView) root.findViewById(R.id.txtPH);
+        txtEC = (TextView) root.findViewById(R.id.txtEC);
+        txtORP = (TextView) root.findViewById(R.id.txtORP);
+        txtTDS = (TextView) root.findViewById(R.id.txtTDS);
+
+
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        String xmlData = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<PTZData >\n" +
+                "<pan>20</pan>\n" +
+                "<tilt>0</tilt>\n" +
+                "</PTZData>";
+        //params.put("some_key", "value-1");
+        //params.put("another_key", "value-2");
+        params.setContentEncoding(xmlData);
+
+        String url = "http://admin:ACLAB2023@192.168.8.105/ISAPI/PTZCtrl/channels/1/continuous";
+
+
         return root;
     }
 
@@ -234,7 +267,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
 
         return set;
     }
+    private void playIPCamera(){
+        String TEST_URL = "rtsp://admin:ACLAB2023@192.168.8.105/ISAPI/Streaming/channels/1";
 
+        Uri uri = Uri.parse(TEST_URL);
+        mLiveCamera.setVideoURI(uri);
+        mLiveCamera.requestFocus();
+        mLiveCamera.start();
+    }
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -243,12 +283,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
                 mChart.setVisibility(View.GONE);
                 mAIPicture.setVisibility(View.GONE);
                 mLiveCamera.setVisibility(View.VISIBLE);
+                playIPCamera();
                 break;
             case R.id.btn2:
                 Log.d("ChatGPT", "GRAPH");
                 mChart.setVisibility(View.VISIBLE);
                 mAIPicture.setVisibility(View.GONE);
                 mLiveCamera.setVisibility(View.GONE);
+                mLiveCamera.stopPlayback();
                 break;
             case R.id.btn3:
                 Log.d("ChatGPT", "AI CAMERA");
@@ -370,6 +412,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         }
     }
 
+
+    public void updateWaterLevelStatus(JSONObject obj){
+        try {
+            JSONObject sensor1 = obj.getJSONArray("sensors").getJSONObject(1);
+            int distance = sensor1.getInt("distance");
+            int id = obj.getInt("id");
+            Log.d("SmartAlgri", id + " **** " + distance);
+            if (distance < 50)  distance = 50;
+            if (distance > 300) distance = 300;
+            int percent = 120 - (distance*4/10);
+            if (id == 0){
+                txtWaterLevel1.setText(percent + "%");
+                water1.setProgress(percent);
+            }else if(id == 1){
+                txtWaterLevel2.setText(percent + "%");
+                water2.setProgress(percent);
+            }else if (id == 2){
+                txtWaterLevel3.setText(percent + "%");
+                water3.setProgress(percent);
+            }
+
+        }catch (Exception e){}
+    }
+
     private int counter = 11;
     public void updateFragmentImage(ImageStationModel imageStation) {
         if(imageStation == null)
@@ -397,5 +463,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
 
         imgFragment5.setImageBitmap(bmp5);
         imgFragment6.setImageBitmap(bmp6);
+    }
+
+    public void updateWaterEPCB(JSONArray jsonObj) {
+        try {
+            double ec = jsonObj.getJSONObject(0).getDouble("sensor_value");
+            double ph = jsonObj.getJSONObject(1).getDouble("sensor_value");
+            double orp = jsonObj.getJSONObject(2).getDouble("sensor_value");
+            double temp = jsonObj.getJSONObject(3).getDouble("sensor_value");
+            Log.d("SmartAlgri", ec + "***" + ph + "***" + orp + "***" + temp);
+            txtPH.setText(String.format("%.1f", ph).replaceAll(Pattern.quote(","),"."));
+            txtTDS.setText((int)orp + "");
+            txtEC.setText(String.format("%.1f", ec).replaceAll(Pattern.quote(","),"."));
+            txtORP.setText(String.format("%.1f", temp).replaceAll(Pattern.quote(","),"."));
+
+        }catch (Exception e){}
     }
 }

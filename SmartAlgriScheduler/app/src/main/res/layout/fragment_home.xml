@@ -22,9 +22,9 @@
                 android:id="@+id/water1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#F6c3e0"
-                app:above_wave_color="#De2f91"
-                app:blow_wave_color="#Bd2d7d"
+                android:background="#9ea8f0"
+                app:above_wave_color="#3446cb"
+                app:blow_wave_color="#2c3ba6"
                 app:progress="50" />
 
             <TextView
@@ -55,9 +55,10 @@
                 android:id="@+id/water2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#9ea8f0"
-                app:above_wave_color="#3446cb"
-                app:blow_wave_color="#2c3ba6"
+
+                android:background="#F6c3e0"
+                app:above_wave_color="#De2f91"
+                app:blow_wave_color="#Bd2d7d"
                 app:progress="80" />
             <TextView
                 android:id="@+id/txtWaterLevel2"
@@ -124,7 +125,8 @@
             android:textSize="10sp"
             app:textOn = "BẬT"
             app:textOff = "TẮT"
-            app:colorBorder="@color/colorAccent"
+            app:colorBorder="#3446cb"
+            app:colorOn="#3446cb"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
@@ -143,9 +145,8 @@
             android:textSize="10sp"
             app:textOn = "BẬT"
             app:textOff = "TẮT"
-            app:colorBorder="#3446cb"
-            app:colorOn="#3446cb"
 
+            app:colorBorder="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
@@ -210,7 +211,7 @@
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentLeft="true"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="10dp"
                 android:layout_marginEnd="10dp"
@@ -230,7 +231,7 @@
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="10dp"
                 android:layout_marginEnd="10dp"

@@ -153,6 +153,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
         String url = "http://admin:ACLAB2023@192.168.8.105/ISAPI/PTZCtrl/channels/1/continuous";
 
 
+        txtWaterLevel4.setText("0 %");
+        water4.setProgress(0);
+
         return root;
     }
 
@@ -269,7 +272,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
     }
     private void playIPCamera(){
         String TEST_URL = "rtsp://admin:ACLAB2023@192.168.8.105/ISAPI/Streaming/channels/1";
-
+        TEST_URL = "http://str1.cvtv.xyz/VTV1HD?token=live";
         Uri uri = Uri.parse(TEST_URL);
         mLiveCamera.setVideoURI(uri);
         mLiveCamera.requestFocus();
@@ -409,6 +412,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
                 water4.setProgress(aPump.getSensorValue());
                 txtWaterLevel4.setText(aPump.getSensorValue() + "%");
             }
+            water4.setProgress(0);
+            txtWaterLevel4.setText("0%");
         }
     }
 
@@ -471,6 +476,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
             double ph = jsonObj.getJSONObject(1).getDouble("sensor_value");
             double orp = jsonObj.getJSONObject(2).getDouble("sensor_value");
             double temp = jsonObj.getJSONObject(3).getDouble("sensor_value");
+
+            ((MainActivity)getActivity()).currentTemp = ((int) (temp * 10))/ 10;
+            ((MainActivity)getActivity()).currentPh = ((int) (ph * 10))/ 10;
+            ((MainActivity)getActivity()).currentTDS = ((int) (orp * 10))/ 10;
+            ((MainActivity)getActivity()).currentHumidity = 78;
+
             Log.d("SmartAlgri", ec + "***" + ph + "***" + orp + "***" + temp);
             txtPH.setText(String.format("%.1f", ph).replaceAll(Pattern.quote(","),"."));
             txtTDS.setText((int)orp + "");
@@ -478,5 +489,58 @@ public class HomeFragment extends Fragment implements View.OnClickListener, OnTo
             txtORP.setText(String.format("%.1f", temp).replaceAll(Pattern.quote(","),"."));
 
         }catch (Exception e){}
+    }
+
+    public void updateAIColor(JSONArray jsonObj) {
+
+        for(int i = 0; i < jsonObj.length(); i++){
+            try {
+                JSONObject obj = jsonObj.getJSONObject(i);
+
+                int index = obj.getInt("sensor_id");
+                String color = obj.getString("sensor_value").replaceAll(Pattern.quote("\n"),"");
+                //Log.d("Scheduler", index + "****" + color);
+                //color = "#ff0000";
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        switch (index){
+                            case 1:
+                                imgFragment1.setBackgroundColor(Color.parseColor(color));
+                                Log.d("Scheduler", "1" + " ***" + index + "****" + color);
+                                break;
+                            case 2:
+                                imgFragment2.setBackgroundColor(Color.parseColor(color));
+                                Log.d("Scheduler", "2" + " ***" + index + "****" + color);
+
+                                break;
+                            case 3:
+                                Log.d("Scheduler", "3" + " ***" + index + "****" + color);
+
+                                imgFragment3.setBackgroundColor(Color.parseColor(color));
+                                break;
+                            case 4:
+                                Log.d("Scheduler", "4" + " ***" + index + "****" + color);
+
+                                imgFragment4.setBackgroundColor(Color.parseColor(color));
+                                break;
+                            case 5:
+                                Log.d("Scheduler", "5" + " ***" + index + "****" + color);
+
+                                imgFragment5.setBackgroundColor(Color.parseColor(color));
+                                break;
+                            case 6:
+                                Log.d("Scheduler", "6" + " ***" + index + "****" + color);
+
+                                imgFragment6.setBackgroundColor(Color.parseColor(color));
+                                break;
+
+                        }
+                    }
+                });
+
+
+            }catch (Exception e){}
+        }
     }
 }

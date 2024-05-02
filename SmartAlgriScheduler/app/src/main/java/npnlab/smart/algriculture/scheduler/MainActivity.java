@@ -53,6 +53,7 @@ import npnlab.smart.algriculture.scheduler.model.SchedulerModel;
 import npnlab.smart.algriculture.scheduler.network.MqttHelper;
 import npnlab.smart.algriculture.scheduler.ui.dashboard.DashboardFragment;
 import npnlab.smart.algriculture.scheduler.ui.home.HomeFragment;
+import npnlab.smart.algriculture.scheduler.ui.notifications.NotificationsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -67,6 +68,11 @@ public class MainActivity extends AppCompatActivity {
     private List<SchedulerModel> mScheduler;
     public SchedulerAdapter mSchedulerAdapter;
     private Gson gson = new Gson();
+
+    public double currentTemp = 0;
+    public double currentHumidity = 0;
+    public double currentPh = 0;
+    public double currentTDS = 0;
 
     private static String getRandomString(final int sizeOfRandomString)
     {
@@ -125,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
                     catch (Exception e) {}
                 } else if(topic.equals("/innovation/algriculture/AABBCCDD/epcb_sensor")){
                     try{
-
+                        Log.d("Scheduler", "Received from EPCB");
                         JSONArray jsonObj = new JSONObject(message.toString()).getJSONArray("sensors");
                         Fragment f = getForegroundFragment();
                         if (f instanceof HomeFragment) {
@@ -133,6 +139,18 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                     catch (Exception e) {}
+                } else if(topic.equals("/innovation/algriculture/AABBCCDD/aiResult")){
+                    try{
+
+                        JSONArray jsonObj = new JSONArray(message.toString());
+                        Fragment f = getForegroundFragment();
+                        if (f instanceof HomeFragment) {
+                            //Log.d("Scheduler", jsonObj.toString());
+                            ((HomeFragment) f).updateAIColor(jsonObj);
+                        }
+                    }
+                    catch (Exception e) {
+                    }
                 }
             }
             @Override
@@ -190,17 +208,62 @@ public class MainActivity extends AppCompatActivity {
         }
         mSchedulerAdapter = new SchedulerAdapter(this, mScheduler);
         Log.d("ChatGPT", "Scheduler size " + mScheduler.size());
-
+        Log.d("ChatGPT", jsonScheduler);
+        final int[] counter_sensor = {0};
         Timer aTimer = new Timer();
         TimerTask aTask = new TimerTask() {
             @Override
             public void run() {
                 DFARun();
                 timerRun();
+                counter_sensor[0]++;
+                if(counter_sensor[0] >= 15){
+                    counter_sensor[0] = 0;
+                    sendRandomValue();
+                }
             }
         };
         aTimer.schedule(aTask, 20000, 1000);
+
+
     }
+
+    private void sendRandomValue(){
+        String json = "{\n" +
+                "\t\"station_id\":\"water_0001\",\n" +
+                "\t\"sensors\": [\n" +
+                "\t\t{\n" +
+                "\t\t\t\"sensor_id\":\"ec_0001\",\n" +
+                "\t\t\t\"sensor_value\": xxxxxx\n" +
+                "\t\t},\n" +
+                "\t\t{\n" +
+                "\t\t\t\"sensor_id\":\"ph_0001\",\n" +
+                "\t\t\t\"sensor_value\": yyyyyy\n" +
+                "\t\t},\n" +
+                "\t\t{\n" +
+                "\t\t\t\"sensor_id\":\"ORP_0001\",\n" +
+                "\t\t\t\"sensor_value\": zzzzzz\n" +
+                "\t\t},\n" +
+                "\t\t{\n" +
+                "\t\t\t\"sensor_id\":\"TEMP_0001\",\n" +
+                "\t\t\t\"sensor_value\": wwwwww\n" +
+                "\t\t}\n" +
+                "\t]\n" +
+                "}";
+        double orp = new Random().nextInt(20) + 150;
+        double temp = (new Random().nextInt(10) + 250)/10.0;
+        double ph = (new Random().nextInt(10) + 60)/10.0;
+        double ec = (new Random().nextInt(5) + 12)/10.0;
+        json = json.replaceAll(Pattern.quote("xxxxxx"), (ec + "").replaceAll(Pattern.quote(","),"."));
+        json = json.replaceAll(Pattern.quote("yyyyyy"), (ph + "").replaceAll(Pattern.quote(","),"."));
+        json = json.replaceAll(Pattern.quote("zzzzzz"), (orp + "").replaceAll(Pattern.quote(","),"."));
+        json = json.replaceAll(Pattern.quote("wwwwww"), (temp + "").replaceAll(Pattern.quote(","),"."));
+
+
+        sendDataMQTT("/innovation/algriculture/AABBCCDD/epcb_sensor", json, false);
+        Log.d("Scheduler", "publish random " + json);
+    }
+
 
     int[] timerCounter = new int[8];
     int[] timerFlag = new int[8];
@@ -217,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
     public void setTimer(int index, int value){
         timerFlag[index] = 0;
         timerCounter[index] = value;
+        if (value == 0) timerFlag[index] = 1;
     }
 
     int[] status = new int[8];
@@ -226,6 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
         for(int i = 0; i < mScheduler.size(); i++){
             String[] startTime = mScheduler.get(i).getStartTime().split(Pattern.quote(":"));
+            String[] stopTime = mScheduler.get(i).getStopTime().split(Pattern.quote(":"));
 
             switch (status[i]){
                 case 0: //Check the activated scheduler
@@ -245,63 +310,84 @@ public class MainActivity extends AppCompatActivity {
                         talkToMe("Còn một phút nữa hệ thống sẽ bắt đầu kích hoạt");
                         Log.d("Scheduler", currTiming + "  " + startTiming);
                         status[i] = 2;
+                        setTimer(0, 60);
                     }
                     break;
                 case 2: //Start the irragation process
 
-                    if(Integer.parseInt(startTime[0]) == currentTime.getHours() && Integer.parseInt(startTime[1]) == currentTime.getMinutes()){
-                        talkToMe("Quy trình tưới tiêu bắt đầu. Máy châm phân 1 hoạt động");
-                        updatePumpStatus(0, true);
-                        status[i] = 3;
-                        int time_out = mScheduler.get(i).getFlow1()/ratio;
-                        setTimer(0, time_out);
+                    //if(Integer.parseInt(startTime[0]) == currentTime.getHours() && Integer.parseInt(startTime[1]) == currentTime.getMinutes()){
+                    if(timerFlag[0] == 1){
+                        if(mScheduler.get(i).getFlow1()/ratio > 0) {
+
+                            talkToMe("Máy châm phân 1 hoạt động");
+                            updatePumpStatus(0, true);
+                            status[i] = 3;
+                            int time_out = mScheduler.get(i).getFlow1() / ratio;
+                            setTimer(0, time_out);
+                        }else{
+                            status[i] = 4;
+                            setTimer(0, 2);
+                        }
 
                     }
                     break;
                 case 3:
                     if(timerFlag[0] == 1){
-                        talkToMe("Máy châm phân 1 kết thúc. Máy châm phân 2 hoạt động");
+                        talkToMe("Máy châm phân 1 kết thúc");
                         updatePumpStatus(0, false);
                         status[i] = 4;
-                        setTimer(0, 2);
+                        setTimer(0, 4);
                     }
                     break;
                 case 4: //Turn on irrigation 2
                     if(timerFlag[0] == 1){
-                        updatePumpStatus(1, true);
-                        status[i] = 5;
-                        int time_out = mScheduler.get(i).getFlow2()/ratio;
-                        setTimer(0, time_out);
+                        if(mScheduler.get(i).getFlow2()/ratio > 0) {
+                            talkToMe("Máy châm phân 2 bắt đầu");
+                            updatePumpStatus(1, true);
+                            status[i] = 5;
+                            int time_out = mScheduler.get(i).getFlow2() / ratio;
+                            setTimer(0, time_out);
+                        }else{
+                            status[i] = 6;
+                            setTimer(0, 2);
+                        }
                     }
                     break;
                 case 5: //Turn off irrigation 2
                     if(timerFlag[0] == 1){
-                        talkToMe("Máy châm phân 2 kết thúc. Máy châm phân 3 hoạt động");
+                        talkToMe("Máy châm phân 2 kết thúc.");
 
                         updatePumpStatus(1, false);
                         status[i] = 6;
-                        setTimer(0, 2);
+                        setTimer(0, 4);
                     }
                     break;
                 case 6: //Turn on irrigation 3
                     if(timerFlag[0] == 1){
-                        updatePumpStatus(2, true);
-                        status[i] = 7;
-                        int time_out = mScheduler.get(i).getFlow3()/ratio;
-                        setTimer(0, time_out);
+                        if(mScheduler.get(i).getFlow3()/ratio > 0) {
+                            talkToMe("Máy châm phân 3 bắt đầu.");
+                            updatePumpStatus(2, true);
+                            status[i] = 7;
+                            int time_out = mScheduler.get(i).getFlow3() / ratio;
+                            setTimer(0, time_out);
+                        }else{
+                            setTimer(0, 2);
+                            status[i] = 8;
+                        }
                     }
                     break;
                 case 7: //Turn of irrigation 3
                     if(timerFlag[0] == 1){
-                        talkToMe("Máy châm phân 3 kết thúc. Bơm xoay vòng hoạt động");
+                        talkToMe("Máy châm phân 3 kết thúc.");
 
                         updatePumpStatus(2, false);
                         status[i] = 8;
-                        setTimer(0, 2);
+                        setTimer(0, 4);
                     }
                     break;
                 case 8:
                     if(timerFlag[0] == 1){
+                        talkToMe("Bơm xoay vòng hoạt động");
                         updatePumpStatus(4, true);
                         setTimer(0, 20);
                         status[i] = 9;
@@ -309,15 +395,29 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 9:
                     if(timerFlag[0] == 1){
-                        talkToMe("Lịch tưới tiêu kết thúc");
-                        updatePumpStatus(4, false);
-                        status[i] = 10;
-                        setTimer(0, 2);
+
+                        int stopTiming = Integer.parseInt(stopTime[0]) * 60 + Integer.parseInt(stopTime[1]);
+
+                        int currentTiming = currentTime.getHours() * 60 + currentTime.getMinutes();
+                        if(stopTiming - currentTiming < 2) {
+                            updatePumpStatus(4, false);
+                            talkToMe("Lịch tưới tiêu kết thúc. Lịch tưới tiêu sẽ được kích hoạt lại lúc " + startTime[0] + " giờ " + startTime[1] + " phút");
+                            status[i] = 0;
+                        }else {
+
+                            int postDelay = mScheduler.get(i).getCycle();
+                            talkToMe("Lịch tưới tiêu kết thúc. Lịch tưới sẽ được lặp lại sau " + postDelay + " phút nữa!");
+                            updatePumpStatus(4, false);
+                            status[i] = 10;
+                            setTimer(0, postDelay * 60);
+                        }
                     }
                     break;
                 case 10:
                     if(timerFlag[0] == 1){
-                        status[i] = 0;
+                        status[i] = 2;
+                        talkToMe("Lịch tưới tiêu chuẩn bị kích hoạt trong 10 giây nữa");
+                        setTimer(0, 10);
                     }
                     break;
                 default:
@@ -341,11 +441,16 @@ public class MainActivity extends AppCompatActivity {
         sendDataMQTT("/innovation/algriculture/AABBCCDD/pumpStatus", json);
     }
 
-    public void sendDataMQTT(String topic, String value){
+    public void sendDataMQTT(String topic, String value, boolean... ret){
         MqttMessage msg = new MqttMessage();
+        boolean retain_msg  = false;
+        if(ret.length == 1)
+        {
+            retain_msg = ret[0];  // Overrided Value
+        }
         msg.setId(1234);
         msg.setQos(0);
-        msg.setRetained(true);
+        msg.setRetained(retain_msg);
 
         byte[] b = value.getBytes(Charset.forName("UTF-8"));
         msg.setPayload(b);
@@ -405,6 +510,13 @@ public class MainActivity extends AppCompatActivity {
         niceTTS.speak(speakWords, TextToSpeech.QUEUE_FLUSH, null);
     }
 
+
+    public void processV9(String msg){
+        Fragment f = getForegroundFragment();
+        if (f instanceof NotificationsFragment) {
+            ((NotificationsFragment) f).updateGPT(msg);
+        }
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //do they have the data
@@ -416,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (result.size() > 0) {
                     String msg = result.get(0).toLowerCase().trim();
-                    //processV9(msg);
+                    processV9(msg);
                 }
             }else{
                 //isProcessingSearch = false;
